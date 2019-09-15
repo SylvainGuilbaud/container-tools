@@ -1,0 +1,32 @@
+<Export generator="IRIS" version="26">
+<Routine name="%ZSTART" type="MAC" languagemode="0"><![CDATA[
+SYSTEM public
+    if $d(^IRIS.Temp("%ZSTART","started")) quit
+    set ^IRIS.Temp("%ZSTART","started")=1
+    job launchapp
+    quit
+launchapp
+    set filename="/usr/irissys/mgr/fortune.txt"
+loop
+    set exitcode=$zf(-100, "/stdout="""_filename_"""", "/usr/games/fortune")
+    if (exitcode'=0) {
+        do ##class(%SYS.System).WriteToConsoleLog("Couldn't get fortune, exit code: " _ exitcode)
+    } else {
+        set file=##class(%Library.File).%New(filename)
+        set status=file.Open("R")
+        if (status) {
+            while 'file.AtEnd {
+                set line=file.ReadLine()
+                if (line'="") {
+                    do ##class(%SYS.System).WriteToConsoleLog("Fortune: "_line)
+                }
+            }
+        } else {
+            do ##class(%SYS.System).WriteToConsoleLog("Could not open fortune results, status: " _ status)
+        }
+    }
+    do file.Close()
+    hang 10
+    goto loop
+]]></Routine>
+</Export>
