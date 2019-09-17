@@ -1,0 +1,3 @@
+* text=auto
+# Shell scripts always run in Linuxland, and so always need Unix LF
+*.sh text eol=lf
